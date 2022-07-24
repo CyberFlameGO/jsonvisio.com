@@ -13,11 +13,14 @@ import {
   NodeProps,
 } from "reaflow";
 import { CustomNode } from "src/components/CustomNode";
-import { getEdgeNodes } from "src/containers/Editor/LiveEditor/helpers";
 import useConfig from "src/hooks/store/useConfig";
 import styled from "styled-components";
 import shallow from "zustand/shallow";
 import toast from "react-hot-toast";
+import {
+  getEdgeNodes,
+  removeNodeEdges,
+} from "src/containers/Editor/LiveEditor/helpers";
 
 interface GraphProps {
   json: string;
@@ -86,6 +89,12 @@ export const Graph: React.FC<GraphProps & CanvasContainerProps> = ({
     e: React.MouseEvent<SVGElement>,
     props: NodeProps
   ) => {
+    if (e.detail === 1 && props.properties.data.isParent) {
+      const removal = removeNodeEdges(props.properties.id, nodes, edges);
+      setNodes(nodes.filter((n) => removal.nodes.includes(n.id)));
+      setEdges(edges.filter((n) => removal.edges.includes(n.id)));
+    }
+
     if (e.detail === 2) {
       toast("Object copied to clipboard!");
       navigator.clipboard.writeText(JSON.stringify(props.properties.text));

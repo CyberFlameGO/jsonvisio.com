@@ -45,7 +45,7 @@ export function getEdgeNodes(
         data: {
           isParent: el.parent,
         },
-        width: isExpanded ? 35 + longestLine * 8 : 180,
+        width: (isExpanded ? 35 + longestLine * 8 : 180) + (el.parent ? 50 : 0),
         height,
       });
     } else {
@@ -73,6 +73,30 @@ export function getNextLayout(layout: CanvasDirection) {
     default:
       return "RIGHT";
   }
+}
+
+export function getIncomingNodeEdges(
+  nodeId: string,
+  nodes: NodeData[],
+  edges: EdgeData[]
+) {
+  const connectedEdges = edges.filter((edge) => edge.from === nodeId);
+  const connectedNodes = nodes.filter((node) =>
+    connectedEdges.map((c) => c.to).includes(node.id)
+  );
+
+  return {
+    nodes: connectedNodes.map((node) => node.id),
+    edges: connectedEdges.map((edge) => edge.id),
+  };
+}
+
+export function removeNodeEdges(
+  nodeId: string,
+  nodes: NodeData[],
+  edges: EdgeData[]
+) {
+  return getIncomingNodeEdges(nodeId, nodes, edges);
 }
 
 function renderText(value: string | object) {
